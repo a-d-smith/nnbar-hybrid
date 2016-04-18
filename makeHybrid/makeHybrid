@@ -1,0 +1,24 @@
+#!/bin/bash
+
+ALLFILES=""
+for f in "$@" ; do
+	ALLFILES="$ALLFILES $f" 
+done
+
+HERE=$(pwd)
+cd /uboone/app/users/rsjones/larlite/UserDev/hybrid/makeHybrid
+
+echo "Getting the data from an ERAna"
+echo ""
+python mac/runERAna.py $ALLFILES
+
+echo "Getting the data from an AnaUnit"
+echo ""
+python mac/runAna.py $ALLFILES
+
+echo "Removing the unwanted files"
+echo ""
+rm ERAnaData.root 
+
+mv hybridPi0Data.root "$HERE/hybridPi0Data.root"
+cd $HERE
