@@ -33,6 +33,7 @@ extern void G__set_cpp_environmenthybrid_loadDataDict();
 #include "TMemberInspector.h"
 #include "loadData.h"
 #include "pi0Distributions.h"
+#include "pi0Train.h"
 #include "testAna.h"
 #include <algorithm>
 namespace std { }
@@ -124,6 +125,7 @@ extern G__linked_taginfo G__hybrid_loadDataDictLN_reverse_iteratorlEvectorlElarl
 extern G__linked_taginfo G__hybrid_loadDataDictLN_larlitecLcLpi0Distributions;
 extern G__linked_taginfo G__hybrid_loadDataDictLN_vectorlETVector3cOallocatorlETVector3gRsPgR;
 extern G__linked_taginfo G__hybrid_loadDataDictLN_reverse_iteratorlEvectorlETVector3cOallocatorlETVector3gRsPgRcLcLiteratorgR;
+extern G__linked_taginfo G__hybrid_loadDataDictLN_larlitecLcLpi0Train;
 extern G__linked_taginfo G__hybrid_loadDataDictLN_larlitecLcLtestAna;
 
 /* STUB derived class for protected member access */

@@ -12,8 +12,10 @@
 #pragma link C++ class larlite::loadData+;
 #pragma link C++ class larlite::testAna+;
 #pragma link C++ class larlite::pi0Distributions+;
+#pragma link C++ class larlite::pi0Train+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

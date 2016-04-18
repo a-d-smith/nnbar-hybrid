@@ -10,7 +10,7 @@ namespace larlite {
 
   bool pi0Distributions::initialize() {
 
-		nt = new TNtuple("pi0Data","pi0Data","M:D:nContained");
+		nt = new TNtuple("pi0Data","pi0Data","M:D:Easym:Efrac:Emin:costheta:nContained:pi0Parent");
 						
 		// The TPC (for microboone) has 6 bounding planes with normals given by:
 		nhat.push_back(TVector3( 0, 0, 1 ));
@@ -28,7 +28,7 @@ namespace larlite {
 		r0.push_back(TVector3(256,   0 ,   0 ));
 		r0.push_back(TVector3( 0 ,   0 ,   0 ));
    
-		loadData dat("pi0Data.root");
+		loadData dat("nnbarData.root");
 		auto evList = dat.evList;
 
 		// For each event
@@ -41,50 +41,63 @@ namespace larlite {
 				for (auto shj : shList){
 					// Avoid double counting
 					if (i > j){
+						int pi0Parent;
 						if (shi.mcParentID == shj.mcParentID && shi.mcParentPDG == 111 && shj.mcParentPDG == 111 && shi.mcPDG == 22 && shj.mcPDG == 22){
 							// shi & shj are the decay products of a pi0
-
-							// We want to calculate some stuff about these photons, 
-							// their invariant mass, M and their impact parameter, D.
-
-							// Invariant mass
-							double cosTheta = shi.Dir.Dot(shj.Dir)/(shi.Dir.Mag()*shj.Dir.Mag());
-							double M = pow( 2 * shi.KE * shj.KE * (1 - cosTheta), 0.5);
-					
-							// Distance of closest approach
-							TVector3 w0 = shi.Start - shj.Start;
-	            double a = shi.Dir.Dot(shi.Dir);
-	            double b = shi.Dir.Dot(shj.Dir);
-	            double c = shj.Dir.Dot(shj.Dir);
-	            double d = shi.Dir.Dot(w0);
-	            double e = shj.Dir.Dot(w0);
-	
-	            TVector3 DVect = w0 + ((b*e - c*d)/(a*c - b*b))*shi.Dir - ((a*e - b*d)/(a*c - b*b))*shj.Dir;
-	            double D = DVect.Mag();
-						
-							// Flag the number of fully contained showers 
-							double L1, L2;
-							bool cont1 = true;
-	            bool cont2 = true;
-
-	            for (int i = 0; i < nhat.size(); i++){
-	              L1 =  ((r0[i] - shi.Start).Dot(nhat[i]))/shi.Dir.Dot(nhat[i]);
-	              L2 =  ((r0[i] - shj.Start).Dot(nhat[i]))/shj.Dir.Dot(nhat[i]);
-
-	              if (L1 < shi.L && L1 > 0){ cont1 = false;}
-	  	          if (L2 < shj.L && L2 > 0){ cont2 = false;}
-			        }
-
-	            if (cont1 && cont2){
-	              nt->Fill(M, D, 2);
-	            }
-	            else if (!cont1 && !cont2){
-	              nt->Fill(M, D, 0);
-	            }
-	            else{
-	              nt->Fill(M, D, 1);
-	            }
+							pi0Parent = 1;
 						}
+						else{
+							pi0Parent = 0;
+						}
+
+						// We want to calculate some stuff about these photons, 
+						// their invariant mass, M, their impact parameter, D
+						// and their energy asymmetry
+
+						// Invariant mass
+						double cosTheta = shi.Dir.Dot(shj.Dir)/(shi.Dir.Mag()*shj.Dir.Mag());
+						double M = pow( 2 * shi.KE * shj.KE * (1 - cosTheta), 0.5);
+					
+						// Distance of closest approach
+						TVector3 w0 = shi.Start - shj.Start;
+	          double a = shi.Dir.Dot(shi.Dir);
+	          double b = shi.Dir.Dot(shj.Dir);
+	          double c = shj.Dir.Dot(shj.Dir);
+	          double d = shi.Dir.Dot(w0);
+	          double e = shj.Dir.Dot(w0);
+	
+	          TVector3 DVect = w0 + ((b*e - c*d)/(a*c - b*b))*shi.Dir - ((a*e - b*d)/(a*c - b*b))*shj.Dir;
+	          double D = DVect.Mag();
+
+						// Energy asymmetry
+						double Easym = abs(shi.KE - shj.KE)/abs(shi.KE + shj.KE);
+
+						// Minimum energy and fractional energy
+						double Emin = min(shi.KE, shj.KE);
+						double Efrac = Emin / max(shi.KE, shj.KE);
+						
+						// Flag the number of fully contained showers 
+						double L1, L2;
+						bool cont1 = true;
+	          bool cont2 = true;
+
+	          for (int k = 0; k < nhat.size(); k++){
+	            L1 =  ((r0[k] - shi.Start).Dot(nhat[k]))/shi.Dir.Dot(nhat[k]);
+	            L2 =  ((r0[k] - shj.Start).Dot(nhat[k]))/shj.Dir.Dot(nhat[k]);
+
+	            if (L1 < shi.L && L1 > 0){ cont1 = false;}
+	  	        if (L2 < shj.L && L2 > 0){ cont2 = false;}
+			      }
+
+	          if (cont1 && cont2){
+	            nt->Fill(M, D, Easym, Efrac, Emin, cosTheta, 2, pi0Parent);
+	          }
+	          else if (!cont1 && !cont2){
+	            nt->Fill(M, D, Easym, Efrac, Emin, cosTheta, 0, pi0Parent);
+	          }
+	          else{
+	            nt->Fill(M, D, Easym, Efrac, Emin, cosTheta, 1, pi0Parent);
+	          }
 					}
 					j++;
 				}
@@ -98,7 +111,6 @@ namespace larlite {
 		delete f;
 
 		return true;
-
   }
   
   bool pi0Distributions::analyze(storage_manager* storage) {
