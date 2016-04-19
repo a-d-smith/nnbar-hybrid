@@ -47,6 +47,10 @@ namespace larlite {
     */
     virtual bool finalize();
 
+		struct candidate{
+			double lnL;
+			bool good;
+		};
   protected:
     
   };

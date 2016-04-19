@@ -9,7 +9,7 @@ using namespace std;
 namespace larlite {
 
   bool pi0Distributions::initialize() {
-
+		
 		nt = new TNtuple("pi0Data","pi0Data","M:lnD:Easym:Efrac:Emin:costheta:nContained:pi0Parent");
 						
 		// The TPC (for microboone) has 6 bounding planes with normals given by:
