@@ -10,7 +10,7 @@ namespace larlite {
 
   bool pi0Distributions::initialize() {
 
-		nt = new TNtuple("pi0Data","pi0Data","M:D:Easym:Efrac:Emin:costheta:nContained:pi0Parent");
+		nt = new TNtuple("pi0Data","pi0Data","M:lnD:Easym:Efrac:Emin:costheta:nContained:pi0Parent");
 						
 		// The TPC (for microboone) has 6 bounding planes with normals given by:
 		nhat.push_back(TVector3( 0, 0, 1 ));
@@ -52,7 +52,7 @@ namespace larlite {
 
 						// We want to calculate some stuff about these photons, 
 						// their invariant mass, M, their impact parameter, D
-						// and their energy asymmetry
+						// and their energy asymmetry etc...
 
 						// Invariant mass
 						double cosTheta = shi.Dir.Dot(shj.Dir)/(shi.Dir.Mag()*shj.Dir.Mag());
@@ -90,13 +90,13 @@ namespace larlite {
 			      }
 
 	          if (cont1 && cont2){
-	            nt->Fill(M, D, Easym, Efrac, Emin, cosTheta, 2, pi0Parent);
+	            nt->Fill(M, log(D), Easym, Efrac, Emin, cosTheta, 2, pi0Parent);
 	          }
 	          else if (!cont1 && !cont2){
-	            nt->Fill(M, D, Easym, Efrac, Emin, cosTheta, 0, pi0Parent);
+	            nt->Fill(M, log(D), Easym, Efrac, Emin, cosTheta, 0, pi0Parent);
 	          }
 	          else{
-	            nt->Fill(M, D, Easym, Efrac, Emin, cosTheta, 1, pi0Parent);
+	            nt->Fill(M, log(D), Easym, Efrac, Emin, cosTheta, 1, pi0Parent);
 	          }
 					}
 					j++;
@@ -106,7 +106,7 @@ namespace larlite {
 		}	
 
 		TFile *f;
-		f = new TFile("OUTPUTpi0Distributions.root", "NEW");
+		f = new TFile("OUTPUTpi0Distributions.root", "RECREATE");
 		nt->Write(); 
 		delete f;
 
